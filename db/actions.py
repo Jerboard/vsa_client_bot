@@ -2,14 +2,14 @@ import sqlalchemy as sa
 import typing as t
 
 from db.base import METADATA, begin_connection
-from datetime import timedelta
+from datetime import datetime
 
 
 class ActionRow(t.Protocol):
     id: int
     action_name: str
     comment: str
-    speed: timedelta
+    speed: float
 
 
 ActionTable = sa.Table(
@@ -18,12 +18,14 @@ ActionTable = sa.Table(
     sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
     sa.Column('action_name', sa.String(255)),
     sa.Column('comment', sa.String(128)),
-    sa.Column('speed', sa.TIMESTAMP),
+    sa.Column('speed', sa.Float),
 )
 
 
 # добавить действие
-async def add_action(action_name: str, comment: str, speed: timedelta) -> None:
+async def add_action(action_name: str, comment: str, time_start: datetime) -> None:
+    different = datetime.now () - time_start
+    speed = float (f'{different.seconds}.{different.microseconds}')
     async with begin_connection () as conn:
         await conn.execute (
             ActionTable.insert ().values (

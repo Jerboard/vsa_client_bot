@@ -75,11 +75,10 @@ async def send_user_tasks(user_id: int, chat_id: t.Union[int, None], status: str
             except Exception as ex:
                 log_error(ex)
 
-    speed = datetime.now() - time_start
     await db.add_action(
         action_name='Просмотр задач',
         comment=str(len(tasks)),
-        speed=speed
+        time_start=time_start
     )
 
 
@@ -104,11 +103,10 @@ async def send_tasks_on_next_3_days():
             for chat_id in chats_ids:
                 await bot.send_message(chat_id, text)
 
-    speed = datetime.now () - time_start
     await db.add_action (
         action_name='Задачи на 3 дня',
         comment=f'Для {len(users_ids)} пользователей',
-        speed=speed
+        time_start=time_start
     )
 
 
@@ -123,11 +121,10 @@ async def send_tasks_tomorrow_for_managers():
                               status='manager',
                               period=tomorrow)
 
-    speed = datetime.now () - time_start
     await db.add_action (
         action_name='Задачи на завтра для менеджеров',
         comment=f'Для {len(managers)} пользователей',
-        speed=speed
+        time_start=time_start
     )
 
 
@@ -177,11 +174,10 @@ async def send_weekly_report():
                     text=statistic_text
                 )
 
-    speed = datetime.now () - time_start
     await db.add_action (
         action_name='Недельный отчёт',
         comment=f'-',
-        speed=speed
+        time_start=time_start
     )
 
 
@@ -203,11 +199,10 @@ async def send_monthly_report():
             await bot.send_message(user_id, statistic_text)
             await bot.send_message(user_id, statistic_count_text)
 
-    speed = datetime.now () - time_start
     await db.add_action (
         action_name='Месячный отчёт',
         comment=f'-',
-        speed=speed
+        time_start=time_start
     )
 
 

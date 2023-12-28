@@ -19,7 +19,6 @@ from utils.func import search_deadline, check_tasks_response
 async def com_start(msg: Message, state: FSMContext):
     await state.clear()
     if msg.text == '/start':
-        # await send_weekly_report()
         is_first = await db.add_user(msg.from_user.id, msg.from_user.full_name, msg.from_user.username)
 
         if is_first:
@@ -177,14 +176,15 @@ async def cancel_action(cb: CallbackQuery, state: FSMContext):
 
 @dp.message(StateFilter(default_state))
 async def take_messages(msg: Message, state: FSMContext):
-    # определяет запрос задач для чата, выводит их в личку
-    if check_tasks_response(msg.text):
-        user_info = await db.get_user_info(msg.from_user.id)
-        period = search_deadline(msg.text)
-        period = period.date() if period is not None else None
-        await send_user_tasks(msg.from_user.id, msg.chat.id, user_info.status, period)
+    if msg.chat.id == msg.from_user.id:
+        # определяет запрос задач для чата, выводит их в личку
+        if check_tasks_response(msg.text):
+            user_info = await db.get_user_info(msg.from_user.id)
+            period = search_deadline(msg.text)
+            period = period.date() if period is not None else None
+            await send_user_tasks(msg.from_user.id, msg.chat.id, user_info.status, period)
 
-    else:
-        # gpt_answer = chatgpt_response(msg.text)
-        # await msg.reply(gpt_answer)
-        await msg.answer('Привет! Функция помощника пока не доступна')
+        else:
+            # gpt_answer = chatgpt_response(msg.text)
+            # await msg.reply(gpt_answer)
+            await msg.answer('Привет! Функция помощника пока не доступна')

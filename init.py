@@ -53,6 +53,8 @@ API_UB_HAS = getenv('API_HAS')
 
 async def set_main_menu() -> None:
     main_menu_commands = [
+        BotCommand (command='/start',
+                    description='Перезапуск'),
         BotCommand(command='/tasks',
                    description='Мои задачи'),
         BotCommand (command='/tasks_today',

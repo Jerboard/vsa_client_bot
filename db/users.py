@@ -6,7 +6,7 @@ from db.base import METADATA, begin_connection
 
 class UserRow(t.Protocol):
     id: int
-    user_id: str
+    user_id: int
     full_name: str
     username: str
     status: str
@@ -15,12 +15,12 @@ class UserRow(t.Protocol):
 UsersTable = sa.Table(
     'users',
     METADATA,
-    sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
-    sa.Column('user_id', sa.String(50)),
+    sa.Column('id', sa.BigInteger, primary_key=True, autoincrement=True),
+    sa.Column('user_id', sa.Integer),
     sa.Column('full_name', sa.String(128)),
     sa.Column('username', sa.String(32)),
     sa.Column('status', sa.String(50), default='user'),
-    sa.Column('admin_id', sa.Integer),
+    sa.Column('admin_id', sa.BigInteger),
 )
 
 
