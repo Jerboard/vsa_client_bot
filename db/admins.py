@@ -2,10 +2,10 @@ import sqlalchemy as sa
 import typing as t
 import bcrypt
 
-from datetime import date
+from datetime import date, datetime, timedelta
 
 from db.base import METADATA, begin_connection
-from db.chats import ChatTable
+from init import TZ
 
 
 class AdminRow(t.Protocol):
@@ -83,7 +83,7 @@ async def add_new_admin(id_on_db: int, user_id: int, full_name: str, username: s
         await conn.execute(query)
 
 
-# все админы со статусом (актив по умолчанию)
+# все админы со статусом
 async def get_all_admins_info(status: str = None) -> tuple[AdminRow]:
     query = AdminTable.select()
 
@@ -93,3 +93,25 @@ async def get_all_admins_info(status: str = None) -> tuple[AdminRow]:
     async with begin_connection () as conn:
         result = await conn.execute (query)
     return result.all()
+
+
+# обновляет статус админов
+async def check_admin_status() -> None:
+    query = AdminTable.select().where(AdminTable.c.status != 'new')
+    today = datetime.now(TZ).date()
+    day_ago_15 = today - timedelta(days=15)
+
+    async with begin_connection () as conn:
+        result = await conn.execute (query)
+
+        for admin in result.all():
+            admin = AdminRow(admin)
+
+            if admin.end_date < day_ago_15:
+                status = 'inactive'
+            elif admin.end_date < today:
+                status = 'debt'
+            else:
+                status = 'active'
+
+            await conn.execute(AdminTable.update().values(status=status).where(AdminTable.c.id == admin.id))

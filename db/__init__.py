@@ -13,7 +13,8 @@ from .admins import (AdminRow,
                      check_admin_password,
                      update_admin_password,
                      add_new_admin,
-                     get_all_admins_info)
+                     get_all_admins_info,
+                     check_admin_status)
 from .message_history import old_message_delete, get_context_message
 from .tasks import (TaskRow,
                     add_task,

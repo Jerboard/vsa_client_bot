@@ -6,6 +6,7 @@ import db
 from init import TZ, bot, START_LINK, DATETIME_STR_FORMAT, log_error
 from keyboards.inline_kb import get_task_kb
 from utils.func import create_rating_text
+from utils.redis_utils import create_filter_active_chats
 
 
 # отправляет список задач
@@ -78,7 +79,7 @@ async def send_user_tasks(user_id: int, chat_id: t.Union[int, None], status: str
     await db.add_action(
         action_name='Просмотр задач',
         comment=str(len(tasks)),
-        speed=speed.seconds
+        speed=speed
     )
 
 
@@ -107,7 +108,7 @@ async def send_tasks_on_next_3_days():
     await db.add_action (
         action_name='Задачи на 3 дня',
         comment=f'Для {len(users_ids)} пользователей',
-        speed=speed.seconds
+        speed=speed
     )
 
 
@@ -126,7 +127,7 @@ async def send_tasks_tomorrow_for_managers():
     await db.add_action (
         action_name='Задачи на завтра для менеджеров',
         comment=f'Для {len(managers)} пользователей',
-        speed=speed.seconds
+        speed=speed
     )
 
 
@@ -171,7 +172,6 @@ async def send_weekly_report():
 
         for user_id in users_have_tasks_on_last_week:
             if user_id:
-                print(user_id)
                 await bot.send_message(
                     chat_id=user_id,
                     text=statistic_text
@@ -181,7 +181,7 @@ async def send_weekly_report():
     await db.add_action (
         action_name='Недельный отчёт',
         comment=f'-',
-        speed=speed.seconds
+        speed=speed
     )
 
 
@@ -207,5 +207,11 @@ async def send_monthly_report():
     await db.add_action (
         action_name='Месячный отчёт',
         comment=f'-',
-        speed=speed.seconds
+        speed=speed
     )
+
+
+# обновляет статус и фильтр
+async def update_admin_state():
+    await db.check_admin_status()
+    await create_filter_active_chats()
